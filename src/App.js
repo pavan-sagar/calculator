@@ -3,31 +3,272 @@ import logo from "./logo.svg";
 import "./App.css";
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      inputValue: "",
+      formulaDisplayValue: "",
+      indexOfLastOperator: -1,
+      expParserArr: [],
+    };
+    this.btnref = React.createRef();
+
+    this.handleBtnPress = this.handleBtnPress.bind(this);
+    this.calculateOutput = this.calculateOutput.bind(this);
+  }
+
+  handleBtnPress(e) {
+    let num = e.target.innerHTML;
+    let prevInputValue = this.state.inputValue;
+
+    //Clear everything if AC button is pressed
+    if (num == "AC") {
+      this.setState({
+        inputValue: "",
+        formulaDisplayValue: "",
+        expParserArr: [],
+      });
+      return;
+    }
+
+    //Clear formula bar if it already is filled with previous formula
+    if (this.state.formulaDisplayValue.length > 0) {
+      this.setState({ formulaDisplayValue: "" });
+    }
+
+    //Ignore if first character is zero
+    if (num == "0" && prevInputValue.length == 0) {
+      return;
+    }
+
+    //Ignore if first character is an operator symbol other than minus (-)
+    if (["+", "x", "÷", "."].includes(num) && prevInputValue.length == 0) {
+      return;
+    }
+
+    //Make the operator as minus if previous is plus and current is minus or vice versa.
+    if (
+      ["+", "-"].includes(num) &&
+      ["+", "-"].includes(prevInputValue[prevInputValue.length - 1])
+    ) {
+      num = "-";
+      //Delete last operator of previous input value
+      this.setState((state, props) => {
+        return {
+          inputValue: state.inputValue.slice(0, state.inputValue.length - 1),
+        };
+      });
+    } //Ignore if consecutive operator symbols are pressed
+    else if (
+      ["+", "-", "x", "÷", "."].includes(num) &&
+      ["+", "-", "*", "/", "."].includes(
+        prevInputValue[prevInputValue.length - 1]
+      )
+    ) {
+      return;
+    } else {
+      //do nothing
+    }
+
+    //Ignore dot is already a dot is present
+    if (num == "." && prevInputValue.includes(".")) {
+      return;
+    }
+
+    //Change symbol for multiply and divide
+    if (num == "x") {
+      num = "*";
+    } else if (num == "÷") {
+      num = "/";
+    } else {
+      //do nothing
+    }
+
+    // Either add the number to current input value string or remove the latest character if delete button is pressed
+    if (num == "←") {
+      this.setState((state, props) => {
+        return {
+          inputValue: state.inputValue.slice(0, state.inputValue.length - 1),
+        };
+      });
+    } else {
+      this.setState((state, props) => {
+        return { inputValue: state.inputValue + num };
+      });
+    }
+  }
+
+  calculateOutput() {
+    //Split and push numbers and operators to parser Array
+
+    let { inputValue, expParserArr, indexOfLastOperator } = this.state;
+    inputValue.split("").map((item, idx) => {
+      if (("+*/-".includes(item) || idx == inputValue.length - 1) && idx != 0) {
+        //If we reach last character
+        if (idx == inputValue.length - 1) {
+          let itemsToPush = parseInt(
+            inputValue.slice(
+              indexOfLastOperator + 1,
+              idx + 1 // Here we are doing idx+1 so that we can capture the last character also
+            )
+          );
+
+          expParserArr.push(itemsToPush);
+          // We are not pushing the last current item as it is already part of itemsToPush
+
+          indexOfLastOperator = idx;
+        } else {
+          let itemsToPush = parseInt(
+            inputValue.slice(indexOfLastOperator + 1, idx)
+          );
+
+          expParserArr.push(itemsToPush);
+          expParserArr.push(item);
+
+          indexOfLastOperator = idx;
+        }
+      }
+    });
+
+    //console.log(expParserArr);
+
+    //Parse the array
+
+    let i = 0;
+    while (i < expParserArr.length) {
+      if (expParserArr[i] == "*") {
+        expParserArr = [
+          ...expParserArr.slice(0, i - 1),
+          expParserArr[i - 1] * expParserArr[i + 1],
+          ...expParserArr.slice(i + 2),
+        ];
+        // i += 2;
+        continue;
+      }
+
+      if (expParserArr[i] == "/") {
+        expParserArr = [
+          ...expParserArr.slice(0, i - 1),
+          expParserArr[i - 1] / expParserArr[i + 1],
+          ...expParserArr.slice(i + 2),
+        ];
+        continue; // i += 2;
+      }
+
+      i++;
+    }
+
+    i = 0;
+    while (i < expParserArr.length) {
+      if (expParserArr[i] == "+") {
+        expParserArr = [
+          ...expParserArr.slice(0, i - 1),
+          expParserArr[i - 1] + expParserArr[i + 1],
+          ...expParserArr.slice(i + 2),
+        ];
+        continue;
+      }
+
+      if (expParserArr[i] == "-") {
+        expParserArr = [
+          ...expParserArr.slice(0, i - 1),
+          expParserArr[i - 1] - expParserArr[i + 1],
+          ...expParserArr.slice(i + 2),
+        ];
+        continue;
+      }
+      i++;
+    }
+
+    //Show formula and latest answer
+
+    let output =
+      expParserArr[0] % 1 > 0
+        ? String(expParserArr[0].toFixed(4))
+        : String(expParserArr[0]); // Show the decimal points only if needed
+
+    this.setState((state, props) => {
+      return {
+        inputValue: output,
+        formulaDisplayValue: state.inputValue,
+        expParserArr: [],
+        indexOfLastOperator: -1,
+      };
+    });
+  }
+
   render() {
     return (
       <div className="App">
         <div className="calculator">
-          <div className="display"></div>
+          <div className="display">
+            <p className="formula-display">{this.state.formulaDisplayValue}</p>
+            <p className="input-display">{this.state.inputValue}</p>
+          </div>
           <div className="numpad">
-            <div className="btn btn-ac">AC</div>
-            <div className="btn btn-divide">&divide;</div> {/*Divide sign*/}
-            <div className="btn btn-delete">&#8592;</div> {/*Left Arrow/ Delete symbol*/}
-            
-            <div className="btn">7</div>
-            <div className="btn">8</div>
-            <div className="btn">9</div>
-            <div className="btn">X</div>
-            <div className="btn">4</div>
-            <div className="btn">5</div>
-            <div className="btn">6</div>
-            <div className="btn">-</div>
-            <div className="btn">1</div>
-            <div className="btn">2</div>
-            <div className="btn">3</div>
-            <div className="btn">+</div>
-            <div className="btn">0</div>
-            <div className="btn">.</div>
-            <div className="btn btn-equal">=</div>
+            <div className="btn btn-ac" onClick={this.handleBtnPress}>
+              AC
+            </div>
+            <div
+              className="btn btn-divide btn-round"
+              onClick={this.handleBtnPress}
+            >
+              &divide;
+            </div>{" "}
+            {/*Divide sign*/}
+            <div
+              className="btn btn-delete btn-round"
+              onClick={this.handleBtnPress}
+            >
+              &#8592;
+            </div>{" "}
+            {/*Left Arrow/ Delete symbol*/}
+            <div className="btn" value="7" onClick={this.handleBtnPress}>
+              7
+            </div>
+            <div className="btn" onClick={this.handleBtnPress}>
+              8
+            </div>
+            <div className="btn" onClick={this.handleBtnPress}>
+              9
+            </div>
+            <div className="btn btn-round" onClick={this.handleBtnPress}>
+              x
+            </div>
+            <div className="btn" onClick={this.handleBtnPress}>
+              4
+            </div>
+            <div className="btn" onClick={this.handleBtnPress}>
+              5
+            </div>
+            <div className="btn" onClick={this.handleBtnPress}>
+              6
+            </div>
+            <div className="btn btn-round" onClick={this.handleBtnPress}>
+              -
+            </div>
+            <div className="btn" onClick={this.handleBtnPress}>
+              1
+            </div>
+            <div className="btn" onClick={this.handleBtnPress}>
+              2
+            </div>
+            <div className="btn" onClick={this.handleBtnPress}>
+              3
+            </div>
+            <div className="btn btn-round" onClick={this.handleBtnPress}>
+              +
+            </div>
+            <div className="btn" onClick={this.handleBtnPress}>
+              .
+            </div>
+            <div className="btn" onClick={this.handleBtnPress}>
+              0
+            </div>
+            <div className="btn btn-equal" onClick={this.calculateOutput}>
+              =
+            </div>
           </div>
         </div>
       </div>
