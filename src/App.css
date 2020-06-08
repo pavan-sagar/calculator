@@ -72,13 +72,13 @@
   color: #c7c7c7;
   font-weight: 600;
   font-size: 1.3rem;
-  transition: background-color 0.5s linear;
+  transition: background-color 0.2s linear, font-size 0.2s linear;
   user-select: none;
 }
 
 .btn:active {
   font-size: 2rem;
-  transition: font-size 0.5s;
+  
 }
 
 .btn.btn-dot {
@@ -88,7 +88,7 @@
 .btn:active {
   background-color: #5f5f5f;
   border-radius: 6rem;
-  transition: background-color 0.5s linear;
+  
 }
 
 .btn-ac {
