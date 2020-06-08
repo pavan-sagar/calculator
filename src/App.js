@@ -158,7 +158,8 @@ class App extends Component {
 
       i++;
     }
-
+    // We transverse to find an operator, remove its previous and next element, perform calculation, and replace these 3 elements in array
+    // with the computer value
     i = 0;
     while (i < expParserArr.length) {
       if (expParserArr[i] == "+") {
@@ -203,7 +204,15 @@ class App extends Component {
       <div className="App">
         <div className="calculator">
           <div className="display">
-            <p className="formula-display">{this.state.formulaDisplayValue}</p>
+            <p
+              className={`formula-display ${
+                this.state.formulaDisplayValue.length > 0
+                  ? ".formula-display-has-value"
+                  : ""
+              }`}
+            >
+              {this.state.formulaDisplayValue}
+            </p>
             <p className="input-display">{this.state.inputValue}</p>
           </div>
           <div className="numpad">
@@ -211,14 +220,14 @@ class App extends Component {
               AC
             </div>
             <div
-              className="btn btn-divide btn-round"
+              className="btn btn-round btn-divide "
               onClick={this.handleBtnPress}
             >
               &divide;
             </div>{" "}
             {/*Divide sign*/}
             <div
-              className="btn btn-delete btn-round"
+              className="btn btn-round btn-delete"
               onClick={this.handleBtnPress}
             >
               &#8592;
@@ -233,7 +242,10 @@ class App extends Component {
             <div className="btn" onClick={this.handleBtnPress}>
               9
             </div>
-            <div className="btn btn-round" onClick={this.handleBtnPress}>
+            <div
+              className="btn btn-round btn-multiply"
+              onClick={this.handleBtnPress}
+            >
               x
             </div>
             <div className="btn" onClick={this.handleBtnPress}>
@@ -245,7 +257,10 @@ class App extends Component {
             <div className="btn" onClick={this.handleBtnPress}>
               6
             </div>
-            <div className="btn btn-round" onClick={this.handleBtnPress}>
+            <div
+              className="btn btn-round btn-minus"
+              onClick={this.handleBtnPress}
+            >
               -
             </div>
             <div className="btn" onClick={this.handleBtnPress}>
@@ -260,7 +275,7 @@ class App extends Component {
             <div className="btn btn-round" onClick={this.handleBtnPress}>
               +
             </div>
-            <div className="btn" onClick={this.handleBtnPress}>
+            <div className="btn btn-dot" onClick={this.handleBtnPress}>
               .
             </div>
             <div className="btn" onClick={this.handleBtnPress}>
