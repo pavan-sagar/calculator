@@ -30,6 +30,7 @@ class App extends Component {
         formulaDisplayValue: "",
         expParserArr: [],
         calculationWasDone: false,
+        indexOfLastOperator: -1,
       });
       return;
     }
@@ -73,8 +74,13 @@ class App extends Component {
       //do nothing
     }
 
-    //Ignore dot is already a dot is present
-    if (num == "." && prevInputValue.includes(".")) {
+    //Ignore dot is already a dot is present in the current number (From last operator index to current index)
+    if (
+      num == "." &&
+      this.state.inputValue
+        .slice(this.state.indexOfLastOperator + 1, this.state.inputValue.length)
+        .includes(".")
+    ) {
       return;
     }
 
@@ -101,8 +107,14 @@ class App extends Component {
           return { inputValue: num };
         });
       } else {
+        let operatorIndex = "1234567890".includes(num)
+          ? this.state.indexOfLastOperator
+          : this.state.inputValue.length;
         this.setState((state, props) => {
-          return { inputValue: state.inputValue + num };
+          return {
+            inputValue: state.inputValue + num,
+            indexOfLastOperator: operatorIndex,
+          };
         });
       }
     }
