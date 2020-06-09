@@ -74,6 +74,7 @@ class App extends Component {
       //do nothing
     }
 
+    debugger;
     //Ignore dot is already a dot is present in the current number (From last operator index to current index)
     if (
       num == "." &&
@@ -107,7 +108,9 @@ class App extends Component {
           return { inputValue: num };
         });
       } else {
-        let operatorIndex = "1234567890".includes(num)
+        
+        //Update the indexOfLastOperator to the index of the operator when it is pressed else let ie be unchanged.
+        let operatorIndex = "1234567890.".includes(num) 
           ? this.state.indexOfLastOperator
           : this.state.inputValue.length;
         this.setState((state, props) => {
@@ -128,7 +131,8 @@ class App extends Component {
   calculateOutput() {
     //Split and push numbers and operators to parser Array
 
-    let { inputValue, expParserArr, indexOfLastOperator } = this.state;
+    let { inputValue, expParserArr } = this.state;
+    let indexOfLastOperator = -1; //We are parsing the inputValue from beginning so this has to be -1
     inputValue.split("").map((item, idx) => {
       if (("+*/-".includes(item) || idx == inputValue.length - 1) && idx != 0) {
         //If we reach last character
