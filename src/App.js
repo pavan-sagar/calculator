@@ -208,6 +208,8 @@ class App extends Component {
     for (let i = output.length - 1; i >= output.length - 3; i--) {
       if (output[i] == "0") {
         output_copy = output.slice(0, i);
+      } else {
+        break;
       }
     }
 
