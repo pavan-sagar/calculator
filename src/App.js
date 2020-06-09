@@ -37,8 +37,8 @@ class App extends Component {
       this.setState({ formulaDisplayValue: "" });
     }
 
-    //Ignore if first character is zero
-    if (num == "0" && prevInputValue.length == 0) {
+    //Ignore zero if first character is also a zero
+    if (num == "0" && prevInputValue.length == 1) {
       return;
     }
 
