@@ -11,6 +11,7 @@ class App extends Component {
       formulaDisplayValue: "",
       indexOfLastOperator: -1,
       expParserArr: [],
+      calculationWasDone: false, //We will set this to true on every = btn press and then during new expression again set it to false.
     };
     this.btnref = React.createRef();
 
@@ -28,6 +29,7 @@ class App extends Component {
         inputValue: "",
         formulaDisplayValue: "",
         expParserArr: [],
+        calculationWasDone: false,
       });
       return;
     }
@@ -93,9 +95,21 @@ class App extends Component {
         };
       });
     } else {
-      this.setState((state, props) => {
-        return { inputValue: state.inputValue + num };
-      });
+      //If a number is pressed after previously a result was calculated, the new inputValue should be the number pressed and not be appended to previous result
+      if (this.state.calculationWasDone && "1234567890".includes(num)) {
+        this.setState((state, props) => {
+          return { inputValue: num };
+        });
+      } else {
+        this.setState((state, props) => {
+          return { inputValue: state.inputValue + num };
+        });
+      }
+    }
+
+    //Make the calculationWasDone flag as false since this is a new calculation
+    if (this.state.calculationWasDone) {
+      this.setState({calculationWasDone:false})
     }
   }
 
@@ -195,6 +209,7 @@ class App extends Component {
         formulaDisplayValue: state.inputValue,
         expParserArr: [],
         indexOfLastOperator: -1,
+        calculationWasDone: true,
       };
     });
   }
