@@ -109,7 +109,7 @@ class App extends Component {
 
     //Make the calculationWasDone flag as false since this is a new calculation
     if (this.state.calculationWasDone) {
-      this.setState({calculationWasDone:false})
+      this.setState({ calculationWasDone: false });
     }
   }
 
@@ -121,7 +121,7 @@ class App extends Component {
       if (("+*/-".includes(item) || idx == inputValue.length - 1) && idx != 0) {
         //If we reach last character
         if (idx == inputValue.length - 1) {
-          let itemsToPush = parseInt(
+          let itemsToPush = Number(
             inputValue.slice(
               indexOfLastOperator + 1,
               idx + 1 // Here we are doing idx+1 so that we can capture the last character also
@@ -133,7 +133,7 @@ class App extends Component {
 
           indexOfLastOperator = idx;
         } else {
-          let itemsToPush = parseInt(
+          let itemsToPush = Number(
             inputValue.slice(indexOfLastOperator + 1, idx)
           );
 
