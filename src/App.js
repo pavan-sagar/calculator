@@ -203,6 +203,16 @@ class App extends Component {
         ? String(expParserArr[0].toFixed(4))
         : String(expParserArr[0]); // Show the decimal points only if needed
 
+    //Remove unecessary zereos after decimal point
+    let output_copy = output.slice(0); //Make string copy
+    for (let i = output.length - 1; i >= output.length - 3; i--) {
+      if (output[i] == "0") {
+        output_copy = output.slice(0, i);
+      }
+    }
+
+    output = output_copy.slice(0);
+
     this.setState((state, props) => {
       return {
         inputValue: output,
